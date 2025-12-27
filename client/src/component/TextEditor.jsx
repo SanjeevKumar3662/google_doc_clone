@@ -31,10 +31,13 @@ const TextEditor = () => {
   }, []);
 
   useEffect(() => {
+    if (wrapperRef.current == null) return;
+
     wrapperRef.current.innerHTML = "";
 
     const editor = document.createElement("div");
     wrapperRef.current.append(editor);
+
     const q = new Quill(editor, {
       theme: "snow",
       modules: { toolbar: TOOLBAR_OPTIONS },
