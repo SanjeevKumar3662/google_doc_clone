@@ -14,9 +14,15 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   // console.log("connected");
+  socket.on("get-document", (documentId) => {
+    const data = "hi, its me mario";
+    // console.log(documentId);
+    socket.join(documentId);
+    socket.emit("load-document", data);
 
-  socket.on("send-changes", (delta) => {
-    socket.broadcast.emit("receive-changes", delta);
+    socket.on("send-changes", (delta) => {
+      socket.broadcast.to(documentId).emit("receive-changes", delta);
+    });
   });
 });
 
