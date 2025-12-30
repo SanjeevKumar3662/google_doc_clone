@@ -45,6 +45,26 @@ const TextEditor = () => {
   }, [socket, quill, documentId]);
 
   useEffect(() => {
+    if (!socket || !quill) return;
+
+    let timeout;
+    console.log("hi");
+    const handler = () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        socket.emit("save-document", quill.getContents());
+      }, 1500);
+    };
+
+    quill.on("text-change", handler);
+
+    return () => {
+      quill.off("text-change", handler);
+      clearTimeout(timeout);
+    };
+  }, [socket, quill]);
+
+  useEffect(() => {
     if (wrapperRef.current == null) return;
 
     wrapperRef.current.innerHTML = "";
@@ -72,7 +92,7 @@ const TextEditor = () => {
   useEffect(() => {
     if (socket == null || quill == null) return;
 
-    const handler = (delta, oldDelt, source) => {
+    const handler = (delta, oldDelta, source) => {
       if (source !== "user") return;
       socket.emit("send-changes", delta);
     };
